@@ -1,6 +1,8 @@
 # MoYuDirectorTools-Besiege-Mod
 Added some useful tools for vedio maker
-
+  
+steam工坊地址: https://steamcommunity.com/sharedfiles/filedetails/?id=2609275998  
+  
 # Previews  
 注意：视频中的卡顿是由github播放器导致的，暂时没有找到解决办法。  
       如果想查看流畅的视频请下载到本地。  
