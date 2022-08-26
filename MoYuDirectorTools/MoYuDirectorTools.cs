@@ -7,6 +7,7 @@ namespace MoYuDirectorTools
 	public class MoYuDirectorTools : ModEntryPoint
 	{
         public static GameObject mod;
+        //public static ModAssetBundle nijigenShaders;
         public override void OnLoad()
         {
 
@@ -17,7 +18,9 @@ namespace MoYuDirectorTools
             mod.AddComponent<RGBController>();
             mod.AddComponent<TimeScaleRendererController>();
             mod.AddComponent<SmoothCameraController>();
-
+            mod.AddComponent<LanguageManager>();
+            //nijigenShaders = ModResource.GetAssetBundle("3to2_shaders");
+            //UnityEngine.Object.DontDestroyOnLoad(nijigenShaders);
             // Called when the mod is loaded.
         }
     }

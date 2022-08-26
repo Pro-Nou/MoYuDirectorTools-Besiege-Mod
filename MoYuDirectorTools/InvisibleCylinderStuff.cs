@@ -42,9 +42,9 @@ namespace MoYuDirectorTools
                 visB = visB.transform.FindChild("Vis").gameObject;
                 visC = visC.transform.FindChild("Vis").gameObject;
             }
-            showA = BB.AddToggle("显示头", "showA", true);
-            showB = BB.AddToggle("显示尾", "showB", true);
-            showC = BB.AddToggle("显示中间", "showC", true);
+            showA = BB.AddToggle(LanguageManager.Instance.outLang.ShowA, "showA", true);
+            showB = BB.AddToggle(LanguageManager.Instance.outLang.ShowB, "showB", true);
+            showC = BB.AddToggle(LanguageManager.Instance.outLang.ShowC, "showC", true);
         }
         private void Start()
         {

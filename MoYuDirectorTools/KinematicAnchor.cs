@@ -21,7 +21,12 @@ namespace MoYuDirectorTools
         public MKey Launch;
         public MMenu rootMenu;
         public MToggle KeepHeld;
-        public MMenu rotFreezeType;
+        public MToggle freezeX;
+        public MToggle freezeY;
+        public MToggle freezeZ;
+        public MToggle freezeXA;
+        public MToggle freezeYA;
+        public MToggle freezeZA;
 
         public MSlider dampenX;
         public MSlider dampenY;
@@ -49,6 +54,15 @@ namespace MoYuDirectorTools
 
         public bool isActivating = false;
         public bool isActivating2 = false;
+        public void displayMenu0(bool active)
+        {
+            freezeX.DisplayInMapper = active;
+            freezeY.DisplayInMapper = active;
+            freezeZ.DisplayInMapper = active;
+            freezeXA.DisplayInMapper = active;
+            freezeYA.DisplayInMapper = active;
+            freezeZA.DisplayInMapper = active;
+        }
         public void displayMenu1(bool active)
         {
             dampenX.DisplayInMapper = active;
@@ -87,25 +101,31 @@ namespace MoYuDirectorTools
             colliders = BlockBehaviour.gameObject.transform.FindChild("Colliders").gameObject;
             Vis = BlockBehaviour.gameObject.transform.FindChild("Vis").gameObject;
 
-            Launch = AddKey("开启", "launch", KeyCode.B);
-            rootMenu = AddMenu("activemode", 0, new List<string> { "旋转锁定", "动量阻尼", "追踪" });
-            KeepHeld = AddToggle("持续激活", "keepheld", false);
-            rotFreezeType = AddMenu("freezetype", 0, new List<string> { "Freeze None", "Freeze X", "Freeze Y", "Freeze Z", "Freeze All" });
+            Launch = AddKey(LanguageManager.Instance.outLang.Launch, "launch", KeyCode.B);
+            rootMenu = AddMenu("activemode", 0, new List<string> { LanguageManager.Instance.outLang.Constraints, LanguageManager.Instance.outLang.Damper, LanguageManager.Instance.outLang.Tracking });
+            KeepHeld = AddToggle(LanguageManager.Instance.outLang.Toggle_Mode, "keepheld", false);
+            freezeX = AddToggle(LanguageManager.Instance.outLang.FreezeX, "freezeX", false);
+            freezeY = AddToggle(LanguageManager.Instance.outLang.FreezeY, "freezeY", false);
+            freezeZ = AddToggle(LanguageManager.Instance.outLang.FreezeZ, "freezeZ", false);
+            freezeXA = AddToggle(LanguageManager.Instance.outLang.Freeze_Angular_X, "freezeXA", false);
+            freezeYA = AddToggle(LanguageManager.Instance.outLang.Freeze_Angular_Y, "freezeYA", false);
+            freezeZA = AddToggle(LanguageManager.Instance.outLang.Freeze_Angular_Z, "freezeZA", false);
+            //rotFreezeType = AddMenu("freezetype", 0, new List<string> { "Freeze None", "Freeze X", "Freeze Y", "Freeze Z", "Freeze All" });
 
-            dampenX = AddSlider("X轴阻尼", "dampenX", 0f, 0f, 10f);
-            dampenY = AddSlider("Y轴阻尼", "dampenY", 0f, 0f, 10f);
-            dampenZ = AddSlider("Z轴阻尼", "dampenZ", 0f, 0f, 10f);
-            limitX = AddSlider("X轴限速", "limitX", 0f, 0f, 10f);
-            limitY = AddSlider("Y轴限速", "limitY", 0f, 0f, 10f);
-            limitZ = AddSlider("Z轴限速", "limitZ", 0f, 0f, 10f);
-            massSlider = AddSlider("质量", "mass", 2f, 0f, 10f);
+            dampenX = AddSlider(LanguageManager.Instance.outLang.DamperX, "dampenX", 0f, 0f, 10f);
+            dampenY = AddSlider(LanguageManager.Instance.outLang.DamperY, "dampenY", 0f, 0f, 10f);
+            dampenZ = AddSlider(LanguageManager.Instance.outLang.DamperZ, "dampenZ", 0f, 0f, 10f);
+            limitX = AddSlider(LanguageManager.Instance.outLang.Max_Speed_X, "limitX", 0f, 0f, 10f);
+            limitY = AddSlider(LanguageManager.Instance.outLang.Max_Speed_Y, "limitY", 0f, 0f, 10f);
+            limitZ = AddSlider(LanguageManager.Instance.outLang.Max_Speed_Z, "limitZ", 0f, 0f, 10f);
+            massSlider = AddSlider(LanguageManager.Instance.outLang.Mass, "mass", 2f, 0f, 10f);
 
-            picker = AddKey("手动锁定", "picker", KeyCode.None);
-            resetPicker = AddKey("重置手动锁定", "reset", KeyCode.None);
-            trackX = AddToggle("trackX", "trackx", true);
-            trackY = AddToggle("trackY", "tracky", true);
-            trackZ = AddToggle("trackZ", "trackz", true);
-            rotSpeed = AddSlider("旋转速度", "rotSpeed", 1f, 0.1f, 2f);
+            picker = AddKey(LanguageManager.Instance.outLang.Lock_On, "picker", KeyCode.None);
+            resetPicker = AddKey(LanguageManager.Instance.outLang.Reset_Lock, "reset", KeyCode.None);
+            trackX = AddToggle(LanguageManager.Instance.outLang.TrackingX, "trackx", true);
+            trackY = AddToggle(LanguageManager.Instance.outLang.TrackingY, "tracky", true);
+            trackZ = AddToggle(LanguageManager.Instance.outLang.TrackingZ, "trackz", true);
+            rotSpeed = AddSlider(LanguageManager.Instance.outLang.Rotate_Speed, "rotSpeed", 1f, 0.1f, 2f);
             try
             {
                 rootMenu.ValueChanged += (int value) =>
@@ -114,21 +134,21 @@ namespace MoYuDirectorTools
                     {
                         case 0:
                             {
-                                rotFreezeType.DisplayInMapper = true;
+                                displayMenu0(true);
                                 displayMenu1(false);
                                 displayMenu2(false);
                                 break;
                             }
                         case 1:
                             {
-                                rotFreezeType.DisplayInMapper = false;
+                                displayMenu0(false);
                                 displayMenu1(true);
                                 displayMenu2(false);
                                 break;
                             }
                         case 2:
                             {
-                                rotFreezeType.DisplayInMapper = false;
+                                displayMenu0(false);
                                 displayMenu1(false);
                                 displayMenu2(true);
                                 break;
@@ -251,38 +271,18 @@ namespace MoYuDirectorTools
                     return;
                 if (isActivating)
                 {
-                    switch (rotFreezeType.Value)
-                    {
-                        case 0:
-                            {
-                                myRigidbody.constraints = RigidbodyConstraints.None;
-                                break;
-                            }
-                        case 1:
-                            {
-                                myRigidbody.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-                                break;
-                            }
-                        case 2:
-                            {
-                                myRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-                                break;
-                            }
-                        case 3:
-                            {
-                                myRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
-                                break;
-                            }
-                        case 4:
-                            {
-                                myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-                                break;
-                            }
-                        default:
-                            {
-                                break;
-                            }
-                    }
+                    if (freezeX.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezePositionX;
+                    if (freezeY.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezePositionY;
+                    if (freezeZ.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezePositionZ;
+                    if (freezeXA.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezeRotationX;
+                    if (freezeYA.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezeRotationY;
+                    if (freezeZA.IsActive)
+                        myRigidbody.constraints |= RigidbodyConstraints.FreezeRotationZ;
                 }
                 else
                     myRigidbody.constraints = RigidbodyConstraints.None;

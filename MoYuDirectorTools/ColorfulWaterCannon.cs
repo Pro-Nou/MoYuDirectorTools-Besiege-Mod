@@ -30,8 +30,8 @@ namespace MoYuDirectorTools
         }
         public virtual void SafeAwake()
         {
-            waterColor = BB.AddColourSlider("液体颜色", "watercolor", new Color(1f, 1f, 1f, 1f), false);
-            waterAlpha = BB.AddSlider("液体不透明度", "wateralpha", 1f, 0f, 1f);
+            waterColor = BB.AddColourSlider(LanguageManager.Instance.outLang.Water_Color, "watercolor", new Color(1f, 1f, 1f, 1f), false);
+            waterAlpha = BB.AddSlider(LanguageManager.Instance.outLang.Water_Alpha, "wateralpha", 1f, 0f, 1f);
         }
         public void Start()
         {

@@ -22,7 +22,7 @@ namespace MoYuDirectorTools
         }
         public virtual void SafeAwake()
         {
-            breakForceSlider = BB.AddSlider("受力阈值", "breakforce", BB.blockJoint.breakForce, 0f, 50000f);
+            breakForceSlider = BB.AddSlider(LanguageManager.Instance.outLang.Break_Force, "breakforce", BB.blockJoint.breakForce, 0f, 50000f);
             try
             {
                 breakForceSlider.ValueChanged += (float value) =>

@@ -26,6 +26,7 @@ namespace MoYuDirectorTools
         public MMenu OptionMenu;
         public MMenu FFTtype;
         public float[] ASData;
+        public float[] ASDataOrg;
         public Color[] colorData;
         public MeshRenderer[] rendererData;
         public float colorOffset = 0;
@@ -46,6 +47,7 @@ namespace MoYuDirectorTools
         public MSlider ASVdis;
         public MSlider ASVoffset;
         public MSlider ASVRoffset;
+        public MSlider ASVLoffset;
         public MMenu ShapeMenu;
         public MColourSlider firstColor;
         public MColourSlider secondColor;
@@ -88,36 +90,37 @@ namespace MoYuDirectorTools
         }
         public override void SafeAwake()
         {
-            OptionMenu = AddMenu("optionmenu", 0, new List<string>() { "音频设置", "可视化设置" });
+            OptionMenu = AddMenu("optionmenu", 0, new List<string>() { LanguageManager.Instance.outLang.Audio_Set, LanguageManager.Instance.outLang.Visualization_Set });
             FFTtype = AddMenu("FFTtype", 0, Enum.GetNames(typeof(FFTWindow)).ToList());
 
-            PlayAC = AddKey("播放", "play", KeyCode.B);
-            Apply = AddToggle("应用", "apply", false);
-            isLoop = AddToggle("循环", "isloop", false);
-            isVisible = AddToggle("可见", "isVisible", true);
-            scaleable = AddToggle("时间缩放", "scaleable", false);
+            PlayAC = AddKey(LanguageManager.Instance.outLang.Play, "play", KeyCode.B);
+            Apply = AddToggle(LanguageManager.Instance.outLang.Apply, "apply", false);
+            isLoop = AddToggle(LanguageManager.Instance.outLang.Loop, "isloop", false);
+            isVisible = AddToggle(LanguageManager.Instance.outLang.Visible, "isVisible", true);
+            scaleable = AddToggle(LanguageManager.Instance.outLang.Time_Scale, "scaleable", false);
             DisplayType = AddMenu("BlendType", 1, new List<string>() { "2D", "3D" });
-            diffuse = AddSlider("扩散强度", "diffuse", 0.5f, 0f, 1f);
-            AudioName = AddText("音源(.wav)", "audio", "AudioName");
+            diffuse = AddSlider(LanguageManager.Instance.outLang.Diffusion_Strength, "diffuse", 0.5f, 0f, 1f);
+            AudioName = AddText(LanguageManager.Instance.outLang.Audio_Source, "audio", "AudioName");
 
-            ASVApply = AddToggle("启用可视化", "asvapply", false);
+            ASVApply = AddToggle(LanguageManager.Instance.outLang.Active_Visualization, "asvapply", false);
             RGBtoggle = AddToggle("R G B!", "rgb", false);
-            listeningMode = AddToggle("监听模式", "listeningMode", false);
-            listeningBlock = AddText("监听GUID", "listeningBlock", "0");
-            StreamLight = AddToggle("流光", "streamLight", false);
-            StreamSpeed = AddSlider("流光速度", "streamSpeed", 1f, 0f, 10.0f);
-            ASRSlider = AddSlider("采样分辨率", "asresolution", 6.0f, 6.0f, 13.0f);
-            MaxFFTVolum = AddSlider("最大采样音量", "maxfftvolum", 1f, 0f, 1f);
-            channelSlider = AddSlider("采样频道", "FFTchannel", 0f, 0f, 8f);
-            ASRScaleSlider = AddSlider("形变强度", "asrscale", 10.0f, 0.0f, 100.0f);
-            ASVheight = AddSlider("单位高度", "asvheight", 1.0f, 0.0f, 100.0f);
-            ASVwidth = AddSlider("单位宽度", "asvwidth", 1.0f, 0.0f, 100.0f);
-            ASVdis = AddSlider("单位间距", "asvdis", 1.0f, 0.0f, 100.0f);
-            ASVoffset = AddSlider("中轴偏移", "asvoffset", 0f, -0.5f, 0.5f);
-            ASVRoffset = AddSlider("倾斜偏移", "asvroffset", 0f, -90f, 90f);
-            ShapeMenu = AddMenu("shapeType", 0, new List<string>() { "条带", "环" });
-            firstColor = AddColourSlider("颜色1", "firstcolor", new Color(1, 0, 0, 1), false);
-            secondColor = AddColourSlider("颜色2", "secondcolor", new Color(1, 0, 0, 1), false);
+            listeningMode = AddToggle(LanguageManager.Instance.outLang.Listening_Mode, "listeningMode", false);
+            listeningBlock = AddText(LanguageManager.Instance.outLang.Listening_GUID, "listeningBlock", "0");
+            StreamLight = AddToggle(LanguageManager.Instance.outLang.Stream_Light, "streamLight", false);
+            StreamSpeed = AddSlider(LanguageManager.Instance.outLang.Stream_Speed, "streamSpeed", 1f, 0f, 10.0f);
+            ASRSlider = AddSlider(LanguageManager.Instance.outLang.FFT_Resolution, "asresolution", 6.0f, 6.0f, 13.0f);
+            MaxFFTVolum = AddSlider(LanguageManager.Instance.outLang.Max_Volume, "maxfftvolum", 1f, 0f, 1f);
+            channelSlider = AddSlider(LanguageManager.Instance.outLang.FFT_Channel, "FFTchannel", 0f, 0f, 8f);
+            ASRScaleSlider = AddSlider(LanguageManager.Instance.outLang.Scale_Strength, "asrscale", 10.0f, 0.0f, 100.0f);
+            ASVheight = AddSlider(LanguageManager.Instance.outLang.Unit_Height, "asvheight", 1.0f, 0.0f, 100.0f);
+            ASVwidth = AddSlider(LanguageManager.Instance.outLang.Unit_Width, "asvwidth", 1.0f, 0.0f, 100.0f);
+            ASVdis = AddSlider(LanguageManager.Instance.outLang.Unit_Distance, "asvdis", 1.0f, 0.0f, 100.0f);
+            ASVoffset = AddSlider(LanguageManager.Instance.outLang.Axis_Offset, "asvoffset", 0f, -0.5f, 0.5f);
+            ASVRoffset = AddSlider(LanguageManager.Instance.outLang.Rotate_Offset, "asvroffset", 0f, -90f, 90f);
+            ASVLoffset = AddSlider(LanguageManager.Instance.outLang.FFT_Offset, "asvloffset", 1.0f, 0.1f, 1.0f);
+            ShapeMenu = AddMenu("shapeType", 0, new List<string>() { LanguageManager.Instance.outLang.Shape_Line, LanguageManager.Instance.outLang.Shape_Circle });
+            firstColor = AddColourSlider(LanguageManager.Instance.outLang.Color1, "firstcolor", new Color(1, 0, 0, 1), false);
+            secondColor = AddColourSlider(LanguageManager.Instance.outLang.Color2, "secondcolor", new Color(1, 0, 0, 1), false);
 
             initAudio();
             colliders = BlockBehaviour.gameObject.transform.FindChild("Colliders").gameObject;
@@ -159,6 +162,7 @@ namespace MoYuDirectorTools
             ASVdis.DisplayInMapper = active;
             ASVoffset.DisplayInMapper = active;
             ASVRoffset.DisplayInMapper = active;
+            ASVLoffset.DisplayInMapper = active;
             FFTtype.DisplayInMapper = active;
             StreamLight.DisplayInMapper = active;
             RGBtoggle.DisplayInMapper = active;
@@ -206,7 +210,7 @@ namespace MoYuDirectorTools
                         isPlaying = ASselect.isPlaying;
                         try
                         {
-                            ASselect.GetSpectrumData(ASData, (int)Mathf.Max(0f, channelSlider.Value), (FFTWindow)FFTtype.Value);
+                            ASselect.GetSpectrumData(ASDataOrg, (int)Mathf.Max(0f, channelSlider.Value), (FFTWindow)FFTtype.Value);
                             UpdateASV();
                         }
                         catch { }
@@ -275,7 +279,7 @@ namespace MoYuDirectorTools
         {
             for (int i = 0; i < ASData.Length; i++)
             {
-                ASData[i] = Mathf.Min(MaxFFTVolum.Value, ASData[i]);
+                ASData[i] = Mathf.Min(MaxFFTVolum.Value, ASDataOrg[i]);
                 float thisScale = 0f;
 
                 if (i < ASData.Length - 1)
@@ -411,7 +415,8 @@ namespace MoYuDirectorTools
                 ASresolution = 13;
             if (ASresolution < 6)
                 ASresolution = 6;
-            ASData = new float[(int)Math.Pow(2, ASresolution)];
+            ASDataOrg = new float[(int)Math.Pow(2, ASresolution)];
+            ASData = new float[(int)(Math.Pow(2, ASresolution) * Mathf.Max(0.1f, Mathf.Min(1.0f, ASVLoffset.Value)))];
             colorData = new Color[ASData.Length];
             rendererData = new MeshRenderer[ASData.Length];
             ASGO.SetActive(false);

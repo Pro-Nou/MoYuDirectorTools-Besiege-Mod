@@ -168,11 +168,11 @@ namespace MoYuDirectorTools
             Vis = BlockBehaviour.gameObject.transform.FindChild("Vis").gameObject;
 
             root = AddMenu("rootmenu", 0, new List<string> { "renderer", "transform" });
-            isVisible = AddToggle("可见", "isVisible", true);
+            isVisible = AddToggle(LanguageManager.Instance.outLang.Visible, "isVisible", true);
             RGB = AddToggle("R G B!", "rgb", false);
-            textColor = AddColourSlider("文字颜色", "textColor", new Color(1f, 1f, 1f, 1f), false);
-            textAlpha = AddSlider("文字不透明度", "textAlpha", 1f, 0f, 1f);
-            textItem = AddText("文本内容", "textItem", "Example");
+            textColor = AddColourSlider(LanguageManager.Instance.outLang.Text_Color, "textColor", new Color(1f, 1f, 1f, 1f), false);
+            textAlpha = AddSlider(LanguageManager.Instance.outLang.Text_Alpha, "textAlpha", 1f, 0f, 1f);
+            textItem = AddText(LanguageManager.Instance.outLang.Text_Item, "textItem", "Example");
             
             initText();
             initTransformSliders();

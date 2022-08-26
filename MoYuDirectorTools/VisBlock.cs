@@ -20,11 +20,30 @@ namespace MoYuDirectorTools
         public MToggle hasCol;
         public MSlider massSlider;
         public MSlider healthSlider;
+
+        public MMenu cullMode;
+        public MMenu zwriteMode;
+        public MMenu blendOp;
+        public MMenu srcBlend;
+        public MMenu dstBlend;
         public MSlider alphaSlider;
+        public MSlider difPower;
+        public MSlider ambientPower;
+        public MSlider shadowThreshold;
+        public MSlider shadowReceiveThreshold;
+        public MSlider shadowBrightness;
+        public MSlider shadowSmoothness;
+        public MSlider rimThreshold;
+        public MSlider specularScale;
         public MColourSlider colourSlider;
         public MColourSlider colourSliderDif;
+        public MColourSlider rimColor;
+        public MColourSlider specular;
+
+
         public MText MeshName;
         public MText TexName;
+        public MText RSName;
         public MText LightName;
         private Rect UIrect = new Rect(0, 100, 512, 600);
 
@@ -54,6 +73,28 @@ namespace MoYuDirectorTools
         public GameObject Vis;
         public GameObject listVis;
 
+        public void initNijigen()
+        {
+            visMat.SetFloat("_CullMode", cullMode.Value);
+            visMat.SetFloat("_ZWriteMode", zwriteMode.Value);
+            visMat.SetFloat("_BlendOp", blendOp.Value);
+            visMat.SetFloat("_SrcBlend", srcBlend.Value);
+            visMat.SetFloat("_DstBlend", dstBlend.Value);
+            Color thiscolor = colourSliderDif.Value;
+            thiscolor.a = Mathf.Max(0f, Mathf.Min(1f, alphaSlider.Value));
+            visMat.SetColor("_Color", thiscolor);
+            visMat.SetFloat("_DiffusePower", difPower.Value);
+            visMat.SetFloat("_AmbientPower", ambientPower.Value);
+            visMat.SetFloat("_ShadowThreshold", shadowThreshold.Value);
+            visMat.SetFloat("_ShadowReceiveThreshold", shadowReceiveThreshold.Value);
+            visMat.SetFloat("_ShadowBrightness", shadowBrightness.Value);
+            visMat.SetFloat("_ShadowSmoothness", shadowSmoothness.Value);
+            visMat.SetColor("_RimColor", rimColor.Value);
+            visMat.SetFloat("_RimThreshold", rimThreshold.Value);
+            visMat.SetColor("_Specular", specular.Value);
+            visMat.SetFloat("_SpecularScale", specularScale.Value);
+            visMat.SetColor("_EmisColor", colourSlider.Value);
+        }
         public void initTransformSliders()
         {
             posx = AddSlider("Pos.x", "posx", 0f, -10f, 10f);
@@ -132,12 +173,29 @@ namespace MoYuDirectorTools
             massSlider.DisplayInMapper = active;
             healthSlider.DisplayInMapper = active;
             shaderType.DisplayInMapper = active;
+
+            cullMode.DisplayInMapper = active;
+            zwriteMode.DisplayInMapper = active;
+            blendOp.DisplayInMapper = active;
+            srcBlend.DisplayInMapper = active;
+            dstBlend.DisplayInMapper = active;
             alphaSlider.DisplayInMapper = active;
             colourSlider.DisplayInMapper = active;
             colourSliderDif.DisplayInMapper = active;
+            rimColor.DisplayInMapper = active;
+            specular.DisplayInMapper = active;
             MeshName.DisplayInMapper = active;
             TexName.DisplayInMapper = active;
             LightName.DisplayInMapper = active;
+            RSName.DisplayInMapper = active;
+            difPower.DisplayInMapper = active;
+            ambientPower.DisplayInMapper = active;
+            shadowThreshold.DisplayInMapper = active;
+            shadowReceiveThreshold.DisplayInMapper = active;
+            shadowBrightness.DisplayInMapper = active;
+            shadowSmoothness.DisplayInMapper = active;
+            rimThreshold.DisplayInMapper = active;
+            specularScale.DisplayInMapper = active;
         }
         public void initMat()
         {
@@ -192,19 +250,39 @@ namespace MoYuDirectorTools
             colliders = BlockBehaviour.gameObject.transform.FindChild("Colliders").gameObject;
             Vis = BlockBehaviour.gameObject.transform.FindChild("Vis").gameObject;
 
-            Apply = AddToggle("应用", "apply", false);
+            Apply = AddToggle(LanguageManager.Instance.outLang.Apply, "apply", false);
             RGB = AddToggle("R G B!", "rgb", false);
-            hasCol = AddToggle("启用碰撞", "hasCol", false);
-            massSlider = AddSlider("质量", "mass", 2f, 0f, 10f);
-            healthSlider = AddSlider("生命值", "health", 10f, 0f, 100f);
-            alphaSlider = AddSlider("不透明度", "alpha", 0.4f, 0f, 0.4f);
-            colourSliderDif = AddColourSlider("主要颜色", "dif", new Color(1, 1, 1, 1), false);
-            colourSlider = AddColourSlider("高光颜色", "hilight", new Color(1, 1, 1, 1), false);
-            MeshName = AddText("模型(.obj)", "meshname", "MeshName");
-            TexName = AddText("贴图(.png)", "texname", "TexName");
-            LightName = AddText("高光(.png)", "lightname", "LightName");
+            hasCol = AddToggle(LanguageManager.Instance.outLang.Collider, "hasCol", false);
+            massSlider = AddSlider(LanguageManager.Instance.outLang.Mass, "mass", 2f, 0f, 10f);
+            healthSlider = AddSlider(LanguageManager.Instance.outLang.Health, "health", 10f, 0f, 100f);
+
+
+            alphaSlider = AddSlider(LanguageManager.Instance.outLang.Alpha, "alpha", 1.0f, 0f, 1.0f);
+            difPower = AddSlider(LanguageManager.Instance.outLang.Diffuse_Strength, "difpower", 0.8f, 0f, 1.0f);
+            ambientPower = AddSlider(LanguageManager.Instance.outLang.Ambient_Strength, "ambientPower", 0.2f, 0f, 1.0f);
+            shadowThreshold = AddSlider(LanguageManager.Instance.outLang.Shadow_Threshold, "shadowThreshold", 0.2f, -1f, 1f);
+            shadowReceiveThreshold = AddSlider(LanguageManager.Instance.outLang.Shadow_Receive_Threshold, "shadowReceiveThreshold", 0.5f, 0f, 1f);
+            shadowBrightness = AddSlider(LanguageManager.Instance.outLang.Shadow_Brightness, "shadowBrightness", 0.6f, 0f, 1f);
+            shadowSmoothness = AddSlider(LanguageManager.Instance.outLang.Shadow_Smoothness, "shadowSmoothness", 1.5f, 0f, 10f);
+            rimThreshold = AddSlider(LanguageManager.Instance.outLang.Rim_Threshold, "rimThreshold", 0.8f, 0f, 1f);
+            specularScale = AddSlider(LanguageManager.Instance.outLang.Specular_Scale, "specularScale", 0.02f, 0f, 1f);
+
+            colourSliderDif = AddColourSlider(LanguageManager.Instance.outLang.Main_Color, "dif", new Color(1, 1, 1, 1), false);
+            colourSlider = AddColourSlider(LanguageManager.Instance.outLang.Emis_Color, "hilight", new Color(1, 1, 1, 1), false);
+            rimColor = AddColourSlider(LanguageManager.Instance.outLang.Rim_Color, "rimColor", new Color(1, 1, 1, 1), false);
+            specular = AddColourSlider(LanguageManager.Instance.outLang.Specular_Color, "specular", new Color(1, 1, 1, 1), false);
+            MeshName = AddText(LanguageManager.Instance.outLang.Meshname, "meshname", "MeshName");
+            TexName = AddText(LanguageManager.Instance.outLang.Main_Tex, "texname", "TexName");
+            RSName = AddText(LanguageManager.Instance.outLang.RS_Tex, "RSname", "RSName");
+            LightName = AddText(LanguageManager.Instance.outLang.Emis_Tex, "lightname", "LightName");
+
             root = AddMenu("rootmenu", 0, new List<string> { "renderer", "transform" });
-            shaderType = AddMenu("shadermenu", 0, new List<string> { "block shader", "alpha blend" });
+            shaderType = AddMenu("shadermenu", 0, new List<string> { "block shader", "alpha blend", "3to2", "3to2 transparent" });
+            cullMode = AddMenu("CullMode", 0, new List<string> { "Cull Off", "Cull Front", "Cull Back" });
+            zwriteMode = AddMenu("ZWriteMode", 1, new List<string> { "ZWrite Off", "Zwrite On" });
+            blendOp = AddMenu("BlendOp", 0, Enum.GetNames(typeof(UnityEngine.Rendering.BlendOp)).ToList());
+            srcBlend = AddMenu("SrcBlend", 5, Enum.GetNames(typeof(UnityEngine.Rendering.BlendMode)).ToList());
+            dstBlend = AddMenu("DstBlend", 10, Enum.GetNames(typeof(UnityEngine.Rendering.BlendMode)).ToList());
 
             //mesh2 = Vis.GetComponent<MeshFilter>();
             renderer = Vis.GetComponent<MeshRenderer>();
@@ -237,8 +315,46 @@ namespace MoYuDirectorTools
                 {
                     visMat.shader = Shader.Find("Particles/Alpha Blended");
                     Color thiscolor = colourSliderDif.Value;
-                    thiscolor.a = Mathf.Max(0f, Mathf.Min(0.4f, alphaSlider.Value));
+                    thiscolor.a = Mathf.Max(0f, Mathf.Min(1f, alphaSlider.Value));
                     visMat.SetColor("_TintColor", thiscolor);
+                }
+                else if(shaderType.Value ==2)
+                {
+                    ModAssetBundle nijigenShaders = ModResource.GetAssetBundle("3to2_shaders");
+                    //Shader nijigenOpaque = nijigenShaders.LoadAsset<Shader>("3to2_Opaque");
+                    //visMat.shader = Instantiate(nijigenOpaque);
+                    visMat.shader = nijigenShaders.LoadAsset<Shader>("3to2_Opaque");
+                    //visMat.shader = Shader.Find("Unlit/3to2_Opaque");
+                    //visMat.shader = Shader.Find("Unlit/3to2_Opaque");
+                    //Debug.Log(visMat.shader);
+
+                    initNijigen();
+                }
+                /*
+                else if(shaderType.Value == 3)
+                {
+                    ModAssetBundle nijigenShaders = ModResource.GetAssetBundle("3to2_shaders");
+                    visMat.shader = nijigenShaders.LoadAsset<Shader>("3to2_AlphaTest");
+                    //visMat.shader = Shader.Find("Unlit/3to2_AlphaTest");
+
+                    initNijigen();
+                }
+                else if (shaderType.Value == 4)
+                {
+                    ModAssetBundle nijigenShaders = ModResource.GetAssetBundle("3to2_shaders");
+                    visMat.shader = nijigenShaders.LoadAsset<Shader>("3to2_AlphaTest+1");
+                    //visMat.shader = Shader.Find("Unlit/3to2_AlphaTest+1");
+
+                    initNijigen();
+                }
+                */
+                else if (shaderType.Value == 3)
+                {
+                    ModAssetBundle nijigenShaders = ModResource.GetAssetBundle("3to2_shaders");
+                    visMat.shader = nijigenShaders.LoadAsset<Shader>("3to2_Transparent");
+                    //visMat.shader = Shader.Find("Unlit/3to2_Transparent");
+
+                    initNijigen();
                 }
             };
             try
@@ -248,6 +364,7 @@ namespace MoYuDirectorTools
                     try
                     {
                         visMat.SetColor("_EmissCol", colourSlider.Value);
+                        visMat.SetColor("_EmisColor", colourSlider.Value);
                     }
                     catch { }
                 };
@@ -256,7 +373,7 @@ namespace MoYuDirectorTools
                     try
                     {
                         Color thiscolor = colourSliderDif.Value;
-                        thiscolor.a = Mathf.Max(0f, Mathf.Min(0.4f, alphaSlider.Value));
+                        thiscolor.a = Mathf.Max(0f, Mathf.Min(1f, alphaSlider.Value));
                         visMat.SetColor("_TintColor", thiscolor);
                     }
                     catch { }
@@ -266,11 +383,72 @@ namespace MoYuDirectorTools
                     }
                     catch { }
                 };
+                rimColor.ValueChanged += (Color color) =>
+                {
+                    visMat.SetColor("_RimColor", rimColor.Value);
+                };
+                specular.ValueChanged += (Color color) =>
+                {
+                    visMat.SetColor("_Specular", specular.Value);
+                };
                 alphaSlider.ValueChanged += (float value) =>
                 {
                     Color thiscolor = colourSliderDif.Value;
-                    thiscolor.a = Mathf.Max(0f, Mathf.Min(0.4f, alphaSlider.Value));
+                    thiscolor.a = Mathf.Max(0f, Mathf.Min(1f, alphaSlider.Value));
+                    visMat.SetColor("_Color", thiscolor);
                     visMat.SetColor("_TintColor", thiscolor);
+                };
+                difPower.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_DiffusePower", difPower.Value);
+                };
+                ambientPower.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_AmbientPower", ambientPower.Value);
+                };
+                cullMode.ValueChanged += (int value) =>
+                {
+                    visMat.SetFloat("_CullMode", cullMode.Value);
+                };
+                zwriteMode.ValueChanged += (int value) =>
+                {
+                    visMat.SetFloat("_ZWriteMode", zwriteMode.Value);
+                };
+                blendOp.ValueChanged += (int value) =>
+                {
+                    visMat.SetFloat("_BlendOp", blendOp.Value);
+                };
+                srcBlend.ValueChanged += (int value) =>
+                {
+                    visMat.SetFloat("_SrcBlend", srcBlend.Value);
+                };
+                dstBlend.ValueChanged += (int value) =>
+                {
+                    visMat.SetFloat("_DstBlend", dstBlend.Value);
+                };
+                shadowThreshold.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_ShadowThreshold", shadowThreshold.Value);
+                };
+                shadowReceiveThreshold.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_ShadowReceiveThreshold", shadowReceiveThreshold.Value);
+                };
+                shadowBrightness.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_ShadowBrightness", shadowBrightness.Value);
+                };
+                shadowSmoothness.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_ShadowSmoothness", shadowSmoothness.Value);
+                };
+                rimThreshold.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_RimThreshold", rimThreshold.Value);
+                };
+                specularScale.ValueChanged += (float value) =>
+                {
+                    visMat.SetFloat("_SpecularScale", specularScale.Value);
                 };
             }
             catch { }
@@ -303,17 +481,22 @@ namespace MoYuDirectorTools
                     else if (shaderType.Value == 1)
                     {
                         Color thiscolor = RGBController.Instance.outputColor;
-                        thiscolor.a = Mathf.Max(0f, Mathf.Min(0.4f, alphaSlider.Value));
+                        thiscolor.a = Mathf.Max(0f, Mathf.Min(1f, alphaSlider.Value));
                         visMat.SetColor("_TintColor", thiscolor);
                     }
+                    else if(shaderType.Value >= 2 && shaderType.Value <= 5)
+                        visMat.SetColor("_EmisColor", RGBController.Instance.outputColor);
                     //HiLightColor = RGBController.Instance.outputColor;
                 }
-                renderer.GetPropertyBlock(VisPropertyBlock);
-                //float damageAmout=renderer.sharedMaterial.GetFloat("_DamageAmount");
-                visMat.SetFloat("_DamageAmount", VisPropertyBlock.GetFloat("_DamageAmount"));
-                //renderer2[0].GetPropertyBlock(VisPropertyBlock);
-                //VisPropertyBlock.SetFloat("_DamageAmount", damageAmout);
-                //renderer2[0].SetPropertyBlock(VisPropertyBlock);
+                if (shaderType.Value == 0)
+                {
+                    renderer.GetPropertyBlock(VisPropertyBlock);
+                    //float damageAmout=renderer.sharedMaterial.GetFloat("_DamageAmount");
+                    visMat.SetFloat("_DamageAmount", VisPropertyBlock.GetFloat("_DamageAmount"));
+                    //renderer2[0].GetPropertyBlock(VisPropertyBlock);
+                    //VisPropertyBlock.SetFloat("_DamageAmount", damageAmout);
+                    //renderer2[0].SetPropertyBlock(VisPropertyBlock);
+                }
             }
             if (OptionsMaster.skinsEnabled != mySkinCode) 
             {
@@ -391,11 +574,22 @@ namespace MoYuDirectorTools
             ResourceController.Instance.addTex(TexName.Value);
             Texture2D loadtex= ResourceController.Instance.getTex(TexName.Value);
             if (loadtex != null)
+            {
                 visMat.SetTexture("_MainTex", loadtex);
+            }
+            ResourceController.Instance.addTex(RSName.Value);
+            Texture2D rstex = ResourceController.Instance.getTex(RSName.Value);
+            if (loadtex != null)
+            {
+                visMat.SetTexture("_RSTex", rstex);
+            }
             ResourceController.Instance.addTex(LightName.Value);
             Texture2D lighttex = ResourceController.Instance.getTex(LightName.Value);
             if (lighttex != null)
+            {
                 visMat.SetTexture("_EmissMap", lighttex);
+                visMat.SetTexture("_EmisTex", lighttex);
+            }
             ResourceController.Instance.addMesh(MeshName.Value);
             List<Mesh> loadmesh= ResourceController.Instance.getMesh(MeshName.Value);
             if (loadmesh != null)

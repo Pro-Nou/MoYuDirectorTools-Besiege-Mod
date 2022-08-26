@@ -19,11 +19,19 @@ namespace MoYuDirectorTools
         public UnityEngine.Light mainLight;
         public Material[] matArray = new Material[2];
         public bool showgui = true;
+        public RenderTexture rt_shadow;
 
         public bool nofog = false;
         public bool nofloor = false;
         public bool noenv = false;
         public bool nobound = false;
+        public bool mainLightAutoRotate = false;
+        public string mainLightAutoRotateSpeed = "80";
+        public float mainLightAutoRotateSpeedF = 10f;
+        public string shadowDistance = "15";
+        public string shadowQuality = "3";
+        public string shadowBias = "0";
+        public string shadowCascades = "0.1,0.3,0.6";
         public string fogDensity = "0.004";
         public string fogStartDis = "140";
         public string[] lightEular = new string[3];
@@ -44,10 +52,11 @@ namespace MoYuDirectorTools
         public List<Texture2D> texs = new List<Texture2D>();
         public Dictionary<string, List<Mesh>> meshes = new Dictionary<string, List<Mesh>>();
         public List<ModAudioClip> audios = new List<ModAudioClip>();
+        public List<ModAssetBundle> assetBundles = new List<ModAssetBundle>();
         //List<List<int>> vtest = new List<List<int>>();
         private string ResourcePath = "Resource";
         private bool isdata = true;
-        private Rect windowRect = new Rect(15f, 400f, 630f, 365f);
+        private Rect windowRect = new Rect(15f, 400f, 630f, 485f);
         private readonly int windowID = ModUtility.GetWindowId();
 
         public ResourceController()
@@ -60,6 +69,7 @@ namespace MoYuDirectorTools
         }
         public void Update()
         {
+            
             if (!isFirstFrame)
             {
                 if (StatMaster.isMainMenu)
@@ -98,6 +108,7 @@ namespace MoYuDirectorTools
                     skybox.SetActive(false);
 
                     getlight();
+                    QualitySettings.shadowProjection = ShadowProjection.StableFit;
                 }
             }
             if(!isFirstFrame)
@@ -106,6 +117,9 @@ namespace MoYuDirectorTools
                     showgui = !showgui;
                 if (skybox.activeSelf)
                     skybox.transform.position = Camera.main.transform.position;
+                if (mainLightAutoRotate)
+                    if (mainLight != null)
+                        mainLight.transform.RotateAround(new Vector3(0f, 0f, 0f), new Vector3(0f, 1f, 0f), mainLightAutoRotateSpeedF * Time.deltaTime);
             }
         }
         public Color str2color(string tgt, Color orgColor)
@@ -121,6 +135,21 @@ namespace MoYuDirectorTools
                 output.g = Convert.ToSingle(colors[1]);
                 output.b = Convert.ToSingle(colors[2]);
                 output.a = Convert.ToSingle(colors[3]);
+            }
+            catch { }
+            return output;
+        }
+        public Vector3 str2vec3 (string tgt, Vector3 org)
+        {
+            Vector3 output = org;
+            try
+            {
+                string[] vectors = tgt.Split(',');
+                if (vectors.Length != 3)
+                    return output;
+                output.x = Convert.ToSingle(vectors[0]);
+                output.y = Convert.ToSingle(vectors[1]);
+                output.z = Convert.ToSingle(vectors[2]);
             }
             catch { }
             return output;
@@ -292,6 +321,7 @@ namespace MoYuDirectorTools
                 lightEular[2] = mainLight.transform.rotation.eulerAngles.z.ToString();
                 lightCol = mainLight.color.ToString().Replace("(", "").Replace(")", "").Replace("RGBA", "").Replace(" ", "");
                 ambientCol = RenderSettings.ambientLight.ToString().Replace("(", "").Replace(")", "").Replace("RGBA", "").Replace(" ", "");
+                //QualitySettings.shadowDistance = 10;
             }
         }
         public System.Collections.IEnumerator setlight()
@@ -311,6 +341,7 @@ namespace MoYuDirectorTools
         }
         public void Start()
         {
+            QualitySettings.shadowCascades = 4;
             //cameraController = FindObjectOfType<FixedCameraController>();
         }
         private void OnGUI()
@@ -319,7 +350,7 @@ namespace MoYuDirectorTools
                 return;
             if (!StatMaster.hudHidden && showgui) 
             {
-                windowRect = GUILayout.Window(windowID, windowRect, new GUI.WindowFunction(ResourceWindow), "MoYu Director Tools (LCtrl+D to hide)");
+                windowRect = GUILayout.Window(windowID, windowRect, new GUI.WindowFunction(ResourceWindow), LanguageManager.Instance.outLang.windowTitle);
             }
         }
         private void ResourceWindow(int windowID)
@@ -328,13 +359,13 @@ namespace MoYuDirectorTools
             GUILayout.Space(10);
             {
                 GUILayout.BeginVertical();
-                if (GUI.Button(new Rect(scrollX, 20f, 200f, 20f), "Open resource folder")) 
+                if (GUI.Button(new Rect(scrollX, 20f, 200f, 20f), LanguageManager.Instance.outLang.Open_resource_folder)) 
                 {
                     Modding.ModIO.OpenFolderInFileBrowser(ResourcePath, isdata);
                 }
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
-                if (GUI.Button(new Rect(scrollX + 210f, 20f, 90f, 20f), "Clear")) 
+                if (GUI.Button(new Rect(scrollX + 210f, 20f, 90f, 20f), LanguageManager.Instance.outLang.Res_Clear)) 
                 {
                     meshes.Clear();
                     texs.Clear();
@@ -347,53 +378,53 @@ namespace MoYuDirectorTools
             GUILayout.BeginHorizontal();
             {
                 GUILayout.BeginVertical();
-                GUI.Label(new Rect(10f, evnY, 140f, 20f), "Environment Controll");
-                if (GUI.Button(new Rect(150f, evnY, 160f, 20f), "Apply Sky Box"))
+                GUI.Label(new Rect(10f, evnY, 140f, 20f), LanguageManager.Instance.outLang.Environment_Control);
+                if (GUI.Button(new Rect(150f, evnY, 160f, 20f), LanguageManager.Instance.outLang.Apply_Sky_Box))
                 {
                     StartCoroutine(updateSkybox());
                 }
-                GUI.Label(new Rect(10f, evnY + 25f, 170f, 20f), "Sky Box Texture");
+                GUI.Label(new Rect(10f, evnY + 25f, 170f, 20f), LanguageManager.Instance.outLang.Sky_Box_Texture);
                 skytexName = GUI.TextField(new Rect(190f, evnY + 25f, 120f, 20f), skytexName);
-                GUI.Label(new Rect(10f, evnY + 50f, 170f, 20f), "Sky Texture Color(RGBA)");
+                GUI.Label(new Rect(10f, evnY + 50f, 170f, 20f), LanguageManager.Instance.outLang.Sky_Texture_Color);
                 skyCol = GUI.TextField(new Rect(190f, evnY + 50f, 120f, 20f), skyCol);
-                GUI.Label(new Rect(10f, evnY + 75f, 170f, 20f), "Background Color(RGBA)");
+                GUI.Label(new Rect(10f, evnY + 75f, 170f, 20f), LanguageManager.Instance.outLang.Background_Color);
                 skyBK = GUI.TextField(new Rect(190f, evnY + 75f, 120f, 20f), skyBK);
-                if (GUI.Button(new Rect(10f, evnY + 100f, 145f, 20f), "No Basic Fog")) 
+                if (GUI.Button(new Rect(10f, evnY + 100f, 145f, 20f), LanguageManager.Instance.outLang.No_Basic_Fog)) 
                 {
                     StartCoroutine(setfog());
                 }
-                if (GUI.Button(new Rect(165f, evnY + 100f, 145f, 20f), "Apply Fog Color")) 
+                if (GUI.Button(new Rect(165f, evnY + 100f, 145f, 20f), LanguageManager.Instance.outLang.Apply_Fog)) 
                 {
                     StartCoroutine(setColorFog());
                 }
-                GUI.Label(new Rect(10f, evnY + 125f, 140f, 20f), "Fog Start Distance");
+                GUI.Label(new Rect(10f, evnY + 125f, 140f, 20f), LanguageManager.Instance.outLang.Fog_Start_Distance);
                 fogStartDis = GUI.TextField(new Rect(150f, evnY + 125f, 160f, 20f), fogStartDis);
-                GUI.Label(new Rect(10f, evnY + 150f, 140f, 20f), "Fog Density");
+                GUI.Label(new Rect(10f, evnY + 150f, 140f, 20f), LanguageManager.Instance.outLang.Fog_Density);
                 fogDensity = GUI.TextField(new Rect(150f, evnY + 150f, 160f, 20f), fogDensity);
-                GUI.Label(new Rect(10f, evnY + 175f, 140f, 20f), "Fog Color(RGBA)");
+                GUI.Label(new Rect(10f, evnY + 175f, 140f, 20f), LanguageManager.Instance.outLang.Fog_Color);
                 fogCol = GUI.TextField(new Rect(150f, evnY + 175f, 160f, 20f), fogCol);
                 //if (StatMaster.isMP)
                 {
-                    if (GUI.Button(new Rect(10f, evnY + 200f, 93f, 20f), "No Floor"))
+                    if (GUI.Button(new Rect(10f, evnY + 200f, 93f, 20f), LanguageManager.Instance.outLang.No_Floor))
                     {
                         StartCoroutine(setfloor());
                     }
-                    if (GUI.Button(new Rect(113f, evnY + 200f, 93f, 20f), "No Env"))
+                    if (GUI.Button(new Rect(113f, evnY + 200f, 93f, 20f), LanguageManager.Instance.outLang.No_Env))
                     {
                         StartCoroutine(setenv());
                     }
-                    if (GUI.Button(new Rect(216f, evnY + 200f, 93f, 20f), "No Bound"))
+                    if (GUI.Button(new Rect(216f, evnY + 200f, 93f, 20f), LanguageManager.Instance.outLang.No_Bound))
                     {
                         StartCoroutine(setbounds());
                     }
                 }
-                GUI.Label(new Rect(10f, evnY + 225f, 140f, 20f), "Main Light Controll");
-                if (GUI.Button(new Rect(165f, evnY + 225f, 145f, 20f), "Apply Main Light"))
+                GUI.Label(new Rect(10f, evnY + 225f, 140f, 20f), LanguageManager.Instance.outLang.Main_Light_Control);
+                if (GUI.Button(new Rect(165f, evnY + 225f, 145f, 20f), LanguageManager.Instance.outLang.Apply_Main_Light))
                 {
                     StartCoroutine(setlight());
                 }
-                GUI.Label(new Rect(10f, evnY + 245f, 140f, 20f), "Main Light Rotation");
-                RGBController.Instance.fixedRGB = GUI.Toggle(new Rect(165f, evnY + 245f, 145f, 20f), RGBController.Instance.fixedRGB, "Fixed RGB");
+                GUI.Label(new Rect(10f, evnY + 245f, 140f, 20f), LanguageManager.Instance.outLang.Main_Light_Rotation);
+                RGBController.Instance.fixedRGB = GUI.Toggle(new Rect(165f, evnY + 245f, 145f, 20f), RGBController.Instance.fixedRGB, LanguageManager.Instance.outLang.Fixed_RGB);
                 GUI.Label(new Rect(10f, evnY + 265f, 20f, 20f), "x:");
                 lightEular[0] = GUI.TextField(new Rect(30f, evnY + 265f, 70f, 20f), lightEular[0]);
                 GUI.Label(new Rect(110f, evnY + 265f, 20f, 20f), "y:");
@@ -401,11 +432,63 @@ namespace MoYuDirectorTools
                 GUI.Label(new Rect(210f, evnY + 265f, 20f, 20f), "z:");
                 lightEular[2] = GUI.TextField(new Rect(230f, evnY + 265f, 70f, 20f), lightEular[2]);
                 
-                GUI.Label(new Rect(10f, evnY + 290f, 170f, 20f), "Light Color(RGBA)");
+                GUI.Label(new Rect(10f, evnY + 290f, 170f, 20f), LanguageManager.Instance.outLang.Light_Color);
                 lightCol = GUI.TextField(new Rect(190f, evnY + 290f, 120f, 20f), lightCol);
-                GUI.Label(new Rect(10f, evnY + 315f, 170f, 20f), "Ambient Color(RGBA)");
+                GUI.Label(new Rect(10f, evnY + 315f, 170f, 20f), LanguageManager.Instance.outLang.Ambient_Color);
                 ambientCol = GUI.TextField(new Rect(190f, evnY + 315f, 120f, 20f), ambientCol);
-                
+                if (GUI.Button(new Rect(10f, evnY + 340f, 145f, 20f), LanguageManager.Instance.outLang.Main_Light_Auto_Rotate))
+                {
+                    //StartCoroutine(setlight());
+                    mainLightAutoRotateSpeedF = Convert.ToSingle(mainLightAutoRotateSpeed);
+                    mainLightAutoRotate = !mainLightAutoRotate;
+                }
+                mainLightAutoRotateSpeed = GUI.TextField(new Rect(190f, evnY + 340f, 120f, 20f), mainLightAutoRotateSpeed);
+                if (GUI.Button(new Rect(10f, evnY + 365f, 145f, 20f), LanguageManager.Instance.outLang.Set_shadow_distance))
+                {
+                    QualitySettings.shadowDistance = Convert.ToSingle(shadowDistance);
+                    //StartCoroutine(setlight());
+                    /*
+                    
+                    QualitySettings.shadowCascades = 4;
+                    QualitySettings.shadowCascade4Split = 
+                    */
+                }
+                shadowDistance = GUI.TextField(new Rect(190f, evnY + 365f, 120f, 20f), shadowDistance);
+                if (GUI.Button(new Rect(10f, evnY + 390f, 145f, 20f), LanguageManager.Instance.outLang.Set_shadow_quality))
+                {
+                    //StartCoroutine(setlight());
+                    //mainLight.shadowCustomResolution = 40960;
+                    int shadowResolution = (int)Math.Max(0f, Convert.ToSingle(shadowQuality));
+                    //if (shadowResolution <= 3)
+                        mainLight.shadowResolution = (LightShadowResolution)Convert.ToInt32(shadowQuality);
+                    /*
+                    else
+                    {
+                        
+                        RenderTextureFormat rtFormat = RenderTextureFormat.Default;
+                        if(!SystemInfo.SupportsRenderTextureFormat(rtFormat))
+                            rtFormat = RenderTextureFormat.Default;
+                        int shadowResolutionInt = 4096 * (int)Mathf.Pow(2, shadowResolution - 3);
+                        rt_shadow = new RenderTexture(shadowResolutionInt, shadowResolutionInt, 24, rtFormat);
+                        rt_shadow.hideFlags = HideFlags.DontSave;
+                        Shader.SetGlobalTexture("_ShadowMapTexture", rt_shadow);
+                    }
+                    */
+                }
+                shadowQuality = GUI.TextField(new Rect(190f, evnY + 390f, 120f, 20f), shadowQuality);
+                if (GUI.Button(new Rect(10f, evnY + 415f, 145f, 20f), LanguageManager.Instance.outLang.Set_shadow_bias))
+                {
+                    //StartCoroutine(setlight());
+                    mainLight.shadowBias = Convert.ToSingle(shadowBias);
+                }
+                shadowBias = GUI.TextField(new Rect(190f, evnY + 415f, 120f, 20f), shadowBias);
+                if (GUI.Button(new Rect(10f, evnY + 440f, 145f, 20f), LanguageManager.Instance.outLang.Shadow_Cascades))
+                {
+                    //StartCoroutine(setlight());
+                    //mainLight.shadowBias = Convert.ToSingle(shadowBias);
+                    QualitySettings.shadowCascade4Split = str2vec3(shadowCascades, QualitySettings.shadowCascade4Split);
+                }
+                shadowCascades = GUI.TextField(new Rect(190f, evnY + 440f, 120f, 20f), shadowCascades);
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
 
@@ -418,12 +501,12 @@ namespace MoYuDirectorTools
             GUILayout.BeginVertical();
             {
                 //StatMaster.collapseSkinMapper
-                GUI.Label(new Rect(scrollX, scrollY, 300f, 20f), "Resources Controll");
-                GUI.Label(new Rect(scrollX, scrollY + 15f, 300f, 20f), "(click to remove, except audios)");
+                GUI.Label(new Rect(scrollX, scrollY, 300f, 20f), LanguageManager.Instance.outLang.Resources_Control);
+                GUI.Label(new Rect(scrollX, scrollY + 15f, 300f, 20f), LanguageManager.Instance.outLang.click_to_remove);
                 //GUI.Label(new Rect(10f, 50f, 300f, 20f), "Resources (click to remove, except audios):");
-                ButtonHeight = (meshes.Count + texs.Count + audios.Count) * 25f;
-                GUI.Box(new Rect(scrollX, scrollY + 35f, 300f, 365f - scrollY - 45f), "");
-                scrollpos = GUI.BeginScrollView(new Rect(scrollX+5f, scrollY+35f, 290f, 365f - scrollY - 55f), scrollpos, new Rect(0f, 0f, 250f, ButtonHeight));
+                ButtonHeight = (meshes.Count + texs.Count + audios.Count + assetBundles.Count) * 25f;
+                GUI.Box(new Rect(scrollX, scrollY + 35f, 300f, 485f - scrollY - 45f), "");
+                scrollpos = GUI.BeginScrollView(new Rect(scrollX+5f, scrollY+35f, 290f, 485f - scrollY - 55f), scrollpos, new Rect(0f, 0f, 250f, ButtonHeight));
                 GUILayout.BeginArea(new Rect(0f, 0f, 300f, ButtonHeight));
                 try
                 {
@@ -455,7 +538,23 @@ namespace MoYuDirectorTools
                         if (GUILayout.Button(a.Name, new GUILayoutOption[] { GUILayout.Width(260f), GUILayout.Height(20f) }))
                         {
                             //audios.Remove(a);
-                            
+                            //Destroy(a);
+                        }
+                    }
+                }
+                catch { }
+                try
+                {
+                    foreach (var a in assetBundles)
+                    {
+                        if (GUILayout.Button(a.Name, new GUILayoutOption[] { GUILayout.Width(260f), GUILayout.Height(20f) }))
+                        {
+
+                            //assetBundles.Remove(a);
+                            //assetBundles.Remove(a);
+                            //AssetBundle.load.Destroy
+                            //Destroy(a);
+                            //Resources.UnloadAsset(a.AssetBundle);
                         }
                     }
                 }
@@ -638,6 +737,15 @@ namespace MoYuDirectorTools
             //texbytes = 
             try
             {
+                /*
+                System.Reflection.Assembly calling = System.Reflection.Assembly.GetCallingAssembly();
+                InternalModding.Mods.ModContainer modByAssembly = InternalModding.Assemblies.AssemblyLoader.GetModByAssembly(calling);
+                string filePath = ResourcePath + "/" + filename;
+                string thisPath = ((!isdata) ? InternalModding.Misc.ModPaths.GetFilePath(modByAssembly.Info, filePath, false) : InternalModding.Misc.ModPaths.GetFilePathData(modByAssembly.Info, filePath));
+                
+                Debug.Log(www.audioClip.ToString());
+                */
+                //WWW www = new WWW("file:///" + ResourcePath);
                 audios.Add(ModResource.CreateAudioClipResource(filename, ResourcePath + "/" + filename, isdata));
                 
             }
@@ -652,6 +760,43 @@ namespace MoYuDirectorTools
                 if (a.Name == filename)
                 {
                     return a.AudioClip;
+                    //return a;
+                }
+            }
+            return null;
+        }
+        public void addAsset(string filename)
+        {
+
+            if (!Modding.ModIO.ExistsFile(ResourcePath + "/" + filename, isdata))
+                return;
+
+            if (assetBundles.Count > 0)
+            {
+                foreach (var a in assetBundles)
+                {
+                    if (a.Name == filename)
+                        return;
+                }
+            }
+
+            //texbytes = 
+            try
+            {
+                assetBundles.Add(ModResource.CreateAssetBundleResource(filename, ResourcePath + "/" + filename, isdata));
+
+            }
+            catch { }
+        }
+        public ModAssetBundle getAsset(string filename)
+        {
+            if (assetBundles.Count == 0)
+                return null;
+            foreach (var a in assetBundles)
+            {
+                if (a.Name == filename)
+                {
+                    return a;
                     //return a;
                 }
             }

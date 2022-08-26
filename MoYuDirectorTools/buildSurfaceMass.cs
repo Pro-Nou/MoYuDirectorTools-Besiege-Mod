@@ -24,8 +24,8 @@ namespace MoYuDirectorTools
         }
         public virtual void SafeAwake()
         {
-            changeMass = BB.AddToggle("改变质量", "changemass", false);
-            massSlider = BB.AddSlider("质量", "mass", 2f, 0f, 10f);
+            changeMass = BB.AddToggle(LanguageManager.Instance.outLang.Change_Mass, "changemass", false);
+            massSlider = BB.AddSlider(LanguageManager.Instance.outLang.Mass, "mass", 2f, 0f, 10f);
 
         }
         public void Start()

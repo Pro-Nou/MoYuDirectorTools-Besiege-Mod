@@ -89,6 +89,12 @@ namespace MoYuDirectorTools
                             block.gameObject.AddComponent(typeof(buildSurfaceMass));
                         break;
                     }
+                case (int)BlockType.ArmorPlateSmall:
+                    {
+                        if (block.gameObject.GetComponent(typeof(screenSort)) == null)
+                            block.gameObject.AddComponent(typeof(screenSort));
+                        break;
+                    }
                 default:
                     {
                         break;

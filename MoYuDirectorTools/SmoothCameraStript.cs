@@ -13,6 +13,7 @@ namespace MoYuDirectorTools
         private Rect UIrect = new Rect(256, 100, 256, 256);
         public BlockBehaviour BB { get; internal set; }
 
+        //public MText CameraNum;
         public MToggle smoothActive;
         public MSlider lifeTimeSlider;
         public MMenu smoothMode;
@@ -33,6 +34,7 @@ namespace MoYuDirectorTools
         public float camFov = 41f;
 
         public FixedCameraBlock cameraBlock;
+        
         private void Awake()
         {
 
@@ -58,13 +60,13 @@ namespace MoYuDirectorTools
         }
         public virtual void SafeAwake()
         {
-            picker = BB.AddKey("手动锁定", "picker", KeyCode.None);
-            resetPicker = BB.AddKey("重置手动锁定", "reset", KeyCode.None);
-            smoothActive = BB.AddToggle("启用平滑", "smoothActive", false);
-            trackActive = BB.AddToggle("启用追踪", "trackActive", false);
-            lifeTimeSlider = BB.AddSlider("持续时间", "lifetime", 1f, 0f, 2f);
+            //CameraNum = BB.AddText("相机编号", "cameraNum", "");
+            picker = BB.AddKey(LanguageManager.Instance.outLang.Lock_On, "picker", KeyCode.None);
+            resetPicker = BB.AddKey(LanguageManager.Instance.outLang.Reset_Lock, "reset", KeyCode.None);
+            smoothActive = BB.AddToggle(LanguageManager.Instance.outLang.Smooth_Active, "smoothActive", false);
+            trackActive = BB.AddToggle(LanguageManager.Instance.outLang.Tracking_Active, "trackActive", false);
+            lifeTimeSlider = BB.AddSlider(LanguageManager.Instance.outLang.Life_Time, "lifetime", 1f, 0f, 2f);
             smoothMode = BB.AddMenu("smoothmode", 0, new List<string> { "t", "t^2", "t^0.5", "cos(t)", "arccos(t)" });
-            
         }
         public void Start()
         {

@@ -16,17 +16,25 @@ namespace MoYuDirectorTools
     {
         public override string Name { get; } = "TimeScaleRendererController";
         public GameObject TimeScaleHandle;
-        public TextMesh timeScaleText;
+        public DynamicText timeScaleText;
         public void Start()
         {
-            TimeScaleHandle = GameObject.Find("HUD").transform.FindChild("Top").FindChild("AlignTopLeftNoFold").FindChild("TimeScale").gameObject;
-            timeScaleText = TimeScaleHandle.transform.FindChild("r_Text").GetComponent<TextMesh>();
-            TimeScaleHandle = TimeScaleHandle.transform.FindChild("Handle").gameObject;
+            TimeScaleHandle = GameObject.Find("HUD").transform.FindChild("TopBar").FindChild("Align (Top Left)").FindChild("TimeScale").gameObject;
+            timeScaleText = TimeScaleHandle.transform.FindChild("r_Text").GetComponent<DynamicText>();
+            TimeScaleHandle = TimeScaleHandle.transform.FindChild("Handle").FindChild("Knob").gameObject;
         }
         public void FixHUD()
         {
-            timeScaleText.text = ((int)(Time.timeScale * 100f)).ToString() + "%";
-            TimeScaleHandle.transform.localPosition = new Vector3(Mathf.Lerp(0.6f, 2.1f, Time.timeScale / 2f), -0.2f, -0.9f);
+            try
+            {
+                timeScaleText.SetText(((int)(Time.timeScale * 100f)).ToString() + "%");
+            }
+            catch { }
+            try
+            {
+                TimeScaleHandle.transform.localPosition = new Vector3(Mathf.Lerp(-0.8f, 0.8f, Time.timeScale / 2f), 0f,0f);
+            }
+            catch { }
         }
     }
     class TimeBlock : BlockScript
@@ -66,7 +74,7 @@ namespace MoYuDirectorTools
                 Destroy(shockwave.GetComponent<SphereCollider>());
                 shockwaveRenderer = shockwave.GetComponent<MeshRenderer>();
                 shockwaveRenderer.material.shader = Shader.Find("FX/Shockwave/Distortion");
-                shockwaveRenderer.material.SetFloat("_Refraction", 10f);
+                shockwaveRenderer.material.SetFloat("_Refraction", 20f);
 
                 AS = shockwave.GetComponent<AudioSource>() ?? shockwave.AddComponent<AudioSource>();
 
@@ -83,13 +91,13 @@ namespace MoYuDirectorTools
         }
         public override void SafeAwake()
         {
-            changeTime = AddKey("开启", "apply", KeyCode.B);
-            isVisible = AddToggle("可见", "isVisible", true);
+            changeTime = AddKey(LanguageManager.Instance.outLang.Launch, "apply", KeyCode.B);
+            isVisible = AddToggle(LanguageManager.Instance.outLang.Visible, "isVisible", true);
             dioMode = AddToggle("Ko no DIO da!", "dio", false);
-            tgtTimeSlider = AddSlider("目标时间倍率", "tgttime", 1f, 0f, 2f);
-            changeSpeedSlider = AddSlider("变换速率", "changespeed", 1f, 0f, 2f);
-            theWorldWidth = AddSlider("特效范围", "FXwidth", 1f, 0f, 10f);
-            theWorldColor = AddColourSlider("特效颜色", "diocolor", new Color(0, 0, 0, 1), false);
+            tgtTimeSlider = AddSlider(LanguageManager.Instance.outLang.Target_Time_Scale, "tgttime", 1f, 0f, 2f);
+            changeSpeedSlider = AddSlider(LanguageManager.Instance.outLang.Change_Speed, "changespeed", 1f, 0f, 2f);
+            theWorldWidth = AddSlider(LanguageManager.Instance.outLang.FXwidth, "FXwidth", 1f, 0f, 10f);
+            theWorldColor = AddColourSlider(LanguageManager.Instance.outLang.FXcolor, "diocolor", new Color(0, 0, 0, 1), false);
 
             colliders = BlockBehaviour.gameObject.transform.FindChild("Colliders").gameObject;
             Vis = BlockBehaviour.gameObject.transform.FindChild("Vis").gameObject;
@@ -207,6 +215,30 @@ namespace MoYuDirectorTools
                     BlockBehaviour.noRigidbody = true;
                 }
                 catch { }
+            }
+            if (BlockBehaviour.isSimulating)
+            {
+                if (changeTime.EmulationPressed())
+                {
+                    if (changeSpeed == 0f)
+                        return;
+                    if (!ischanging)
+                    {
+                        timeOffset = 0f;
+                        ischanging = true;
+                        if (dioMode.IsActive)
+                        {
+                            if (!theWorld)
+                            {
+                                currentTimeScale = Time.timeScale;
+                                shockwave.SetActive(true);
+                            }
+                            theWorld = !theWorld;
+                        }
+                        else
+                            currentTimeScale = Time.timeScale;
+                    }
+                }
             }
         }
     }
