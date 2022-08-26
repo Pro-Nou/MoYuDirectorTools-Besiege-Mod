@@ -87,6 +87,8 @@ useful tools for video makers <!-- FIX: Insert a short description here. -->
 	<Blocks>
 		<!-- <Block path="SomeBlock.xml" /> -->
 		<Block path="VisBlock.xml" />
+    <Block path="AnimeBlock.xml" />
+    <Block path="VideoBlock.xml" />
 		<Block path="AudioBlock.xml" />
 		<Block path="TextBlock.xml" />
     <Block path="TimeBlock.xml" />
@@ -126,13 +128,18 @@ useful tools for video makers <!-- FIX: Insert a short description here. -->
 		<Texture name="icon" path="icon.png" />
     <Mesh name="Box" path="Box.obj" />
     <Mesh name="SkyBall" path="SkyBall.obj" />
+    <Mesh name="Plane" path="Plane.obj" />
     <Texture name="Mesh White" path="MeshWhite.png" />
+    <Texture name="Anime White" path="AnimeWhite.png" />
+    <Texture name="Video White" path="VideoWhite.png" />
     <Texture name="AC White" path="ACWhite.png" />
     <Texture name="Clock Tex" path="clockTex.png" />
     <Texture name="Anchor" path="Anchor.png" />
     <Texture name="TextTex" path="textTex.png" />
 
     <AudioClip name="THE WORLD" path="theWorld.wav" />
+
+    <AssetBundle name="3to2_shaders" path="3to2_shaders.assets" />
 	</Resources>
 
 
