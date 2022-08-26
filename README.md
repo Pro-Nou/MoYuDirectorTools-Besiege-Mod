@@ -73,6 +73,16 @@ https://user-images.githubusercontent.com/74658051/180635989-8dde4315-4bcd-4b21-
 与meshmode类似，可对localtransform进行编辑。  
 Similar to meshmode, localtransform can be edited.  
 
+# (unity Animator加载器)AnimeBlock
+·(效果概览)overall view
+
+https://www.bilibili.com/video/BV16U4y1C7Ha  
+
+导入带有animator的unity预制件并播放，使用方法参照steam工坊说明  
+
+# (unity Animator加载器)VideoBlock
+
+导入unity5.4的MovieTexture预制件并播放，使用方法参照steam工坊说明  
 
 # (.wav音频加载器)AudioBlock
 ·(效果概览)overall view
